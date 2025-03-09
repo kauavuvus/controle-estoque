@@ -8,6 +8,7 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -23,6 +24,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Imagem</th>
                         <th>Nome</th>
                         <th>Tamanho</th>
                         <th>Cor</th>
@@ -34,9 +36,10 @@
             </table>
             <h2>Adicionar Novo Item</h2>
             <input type="text" id="item-name" placeholder="Nome do Produto">
-            <input type="text" id="item-size" placeholder="Tamanho">
+            <input type="text" id="item-size" placeholder="Tamanho (Ex: P, M, G)">
             <input type="text" id="item-color" placeholder="Cor">
             <input type="number" id="item-quantity" placeholder="Quantidade">
+            <input type="file" id="item-image" accept="image/*">
             <button onclick="addItem()">Adicionar</button>
         </div>
     </div>

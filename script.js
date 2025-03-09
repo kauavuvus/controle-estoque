@@ -9,10 +9,10 @@ const firebaseConfig = {
     measurementId: "G-JTGYQ498FD"
 };
 
-// Inicializando o Firebase corretamente
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
+const storage = firebase.storage();
 
 function login() {
     const email = document.getElementById("email").value;
@@ -43,6 +43,7 @@ function loadInventory() {
         snapshot.forEach(item => {
             const data = item.val();
             const row = `<tr>
+                <td><img src="${data.image}" alt="Imagem"></td>
                 <td>${data.name}</td>
                 <td>${data.size}</td>
                 <td>${data.color}</td>
@@ -59,16 +60,23 @@ function addItem() {
     const size = document.getElementById("item-size").value;
     const color = document.getElementById("item-color").value;
     const quantity = document.getElementById("item-quantity").value;
+    const file = document.getElementById("item-image").files[0];
 
-    if (name && size && color && quantity) {
-        const newItem = db.ref("inventory").push();
-        newItem.set({ name, size, color, quantity });
-        document.getElementById("item-name").value = "";
-        document.getElementById("item-size").value = "";
-        document.getElementById("item-color").value = "";
-        document.getElementById("item-quantity").value = "";
+    if (name && size && color && quantity && file) {
+        const storageRef = storage.ref("images/" + file.name);
+        storageRef.put(file).then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+                const newItem = db.ref("inventory").push();
+                newItem.set({ name, size, color, quantity, image: url });
+                document.getElementById("item-name").value = "";
+                document.getElementById("item-size").value = "";
+                document.getElementById("item-color").value = "";
+                document.getElementById("item-quantity").value = "";
+                document.getElementById("item-image").value = "";
+            });
+        });
     } else {
-        alert("Preencha todos os campos");
+        alert("Preencha todos os campos e selecione uma imagem");
     }
 }
 
