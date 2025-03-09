@@ -21,23 +21,11 @@
         </div>
         <div id="app" style="display:none;">
             <button onclick="logout()">Sair</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Imagem</th>
-                        <th>Nome</th>
-                        <th>Tamanho</th>
-                        <th>Cor</th>
-                        <th>Quantidade</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory"></tbody>
-            </table>
+            <div id="products-container"></div>
             <h2>Adicionar Novo Item</h2>
             <input type="text" id="item-name" placeholder="Nome do Produto">
-            <input type="text" id="item-size" placeholder="Tamanho (Ex: P, M, G)">
-            <input type="text" id="item-color" placeholder="Cor">
+            <input type="text" id="item-size" placeholder="Tamanhos Disponíveis (Ex: P, M, G)">
+            <input type="text" id="item-color" placeholder="Cores Disponíveis">
             <input type="number" id="item-quantity" placeholder="Quantidade">
             <input type="file" id="item-image" accept="image/*">
             <button onclick="addItem()">Adicionar</button>

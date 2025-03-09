@@ -22,7 +22,7 @@ function login() {
         .then(() => {
             document.getElementById("login").style.display = "none";
             document.getElementById("app").style.display = "block";
-            loadInventory();
+            loadProducts();
         })
         .catch(error => {
             alert("Erro ao entrar: " + error.message);
@@ -36,38 +36,41 @@ function logout() {
     });
 }
 
-function loadInventory() {
+function loadProducts() {
     db.ref("inventory").on("value", snapshot => {
-        const inventoryTable = document.getElementById("inventory");
-        inventoryTable.innerHTML = "";
+        const container = document.getElementById("products-container");
+        container.innerHTML = "";
         snapshot.forEach(item => {
             const data = item.val();
-            const row = `<tr>
-                <td><img src="${data.image}" alt="Imagem"></td>
-                <td>${data.name}</td>
-                <td>${data.size}</td>
-                <td>${data.color}</td>
-                <td>${data.quantity}</td>
-                <td><button onclick="removeItem('${item.key}')">Remover</button></td>
-            </tr>`;
-            inventoryTable.innerHTML += row;
+            const productCard = `<div class="product-card">
+                <img src="${data.image}" alt="Imagem">
+                <h3>${data.name}</h3>
+                <div class="product-options">
+                    <label>Cor:</label>
+                    <select>${data.colors.map(color => `<option>${color}</option>`).join("")}</select>
+                    <label>Tamanho:</label>
+                    <select>${data.sizes.map(size => `<option>${size}</option>`).join("")}</select>
+                </div>
+                <p>Quantidade disponível: ${data.quantity}</p>
+            </div>`;
+            container.innerHTML += productCard;
         });
     });
 }
 
 function addItem() {
     const name = document.getElementById("item-name").value;
-    const size = document.getElementById("item-size").value;
-    const color = document.getElementById("item-color").value;
+    const sizes = document.getElementById("item-size").value.split(",");
+    const colors = document.getElementById("item-color").value.split(",");
     const quantity = document.getElementById("item-quantity").value;
     const file = document.getElementById("item-image").files[0];
 
-    if (name && size && color && quantity && file) {
+    if (name && sizes.length && colors.length && quantity && file) {
         const storageRef = storage.ref("images/" + file.name);
         storageRef.put(file).then(snapshot => {
             snapshot.ref.getDownloadURL().then(url => {
                 const newItem = db.ref("inventory").push();
-                newItem.set({ name, size, color, quantity, image: url });
+                newItem.set({ name, sizes, colors, quantity, image: url });
                 document.getElementById("item-name").value = "";
                 document.getElementById("item-size").value = "";
                 document.getElementById("item-color").value = "";
@@ -78,8 +81,4 @@ function addItem() {
     } else {
         alert("Preencha todos os campos e selecione uma imagem");
     }
-}
-
-function removeItem(key) {
-    db.ref("inventory/" + key).remove();
 }
