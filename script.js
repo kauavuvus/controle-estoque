@@ -12,7 +12,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
-const storage = firebase.storage();
 
 function login() {
     const email = document.getElementById("email").value;
@@ -45,40 +44,29 @@ function loadProducts() {
             const productCard = `<div class="product-card">
                 <img src="${data.image}" alt="Imagem">
                 <h3>${data.name}</h3>
-                <div class="product-options">
-                    <label>Cor:</label>
-                    <select>${data.colors.map(color => `<option>${color}</option>`).join("")}</select>
-                    <label>Tamanho:</label>
-                    <select>${data.sizes.map(size => `<option>${size}</option>`).join("")}</select>
+                <div class="color-options">
+                    ${data.colors.map(color => `<div class="color-circle" style="background:${color}"></div>`).join("")}
                 </div>
-                <p>Quantidade disponível: ${data.quantity}</p>
+                <div class="size-options">
+                    ${data.sizes.map(size => `<button class="size-button">${size}</button>`).join("")}
+                </div>
+                <div class="quantity-control">
+                    <button onclick="updateQuantity('${item.key}', -1)">-</button>
+                    <span>${data.quantity}</span>
+                    <button onclick="updateQuantity('${item.key}', 1)">+</button>
+                </div>
             </div>`;
             container.innerHTML += productCard;
         });
     });
 }
 
-function addItem() {
-    const name = document.getElementById("item-name").value;
-    const sizes = document.getElementById("item-size").value.split(",");
-    const colors = document.getElementById("item-color").value.split(",");
-    const quantity = document.getElementById("item-quantity").value;
-    const file = document.getElementById("item-image").files[0];
-
-    if (name && sizes.length && colors.length && quantity && file) {
-        const storageRef = storage.ref("images/" + file.name);
-        storageRef.put(file).then(snapshot => {
-            snapshot.ref.getDownloadURL().then(url => {
-                const newItem = db.ref("inventory").push();
-                newItem.set({ name, sizes, colors, quantity, image: url });
-                document.getElementById("item-name").value = "";
-                document.getElementById("item-size").value = "";
-                document.getElementById("item-color").value = "";
-                document.getElementById("item-quantity").value = "";
-                document.getElementById("item-image").value = "";
-            });
-        });
-    } else {
-        alert("Preencha todos os campos e selecione uma imagem");
-    }
+function updateQuantity(key, change) {
+    db.ref(`inventory/${key}`).get().then(snapshot => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            const newQuantity = Math.max(0, data.quantity + change);
+            db.ref(`inventory/${key}`).update({ quantity: newQuantity });
+        }
+    });
 }
